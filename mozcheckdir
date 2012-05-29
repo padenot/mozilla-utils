@@ -1,0 +1,25 @@
+#!/bin/sh
+
+files=$(ls -f client.mk configure.in LEGAL LICENSE mozconfig 2> /dev/null )
+
+OBJ=$(find . -maxdepth 1 -iname "*obj*")
+
+found=$(echo $files | wc -w)
+
+if [ $found -ne 5 ]
+then
+  echo "Could not recognize mozilla-central directory."
+  exit 1
+fi
+
+if [ -z $OBJ ]
+then
+  echo "Could not find objdir."
+  exit 1
+fi
+
+if [ $found -eq 5 && -n $OBJ ]
+then
+  unset files
+fi
+

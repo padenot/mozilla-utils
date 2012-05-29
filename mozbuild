@@ -1,0 +1,38 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/mozcheckdir
+
+usage() {
+  echo "$0 path/ to/ compile/"
+}
+
+# locate objdir
+OBJ=$(find . -maxdepth 1 -iname "*obj*")
+
+if [ -z $OBJ ]
+then
+  echo "Failed to locate objdir."
+  exit 1
+fi
+
+dirs=$*
+
+if [ -z $dirs ]
+then
+  echo "Nothing specified."
+  dirs="."
+fi
+
+for i in $dirs
+do
+  make -C $OBJ/$i
+  if [ $? -ne 0 ]
+  then
+    notify-send "Build failed."
+  else
+    notify-send "$i OK"
+  fi
+done
+
+notify-send "Build done."

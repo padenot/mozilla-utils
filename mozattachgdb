@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/mozcheckdir
+
+# Get the PID of the firefox instance which is running from an objdir
+PID=$(ps aux | grep "obj.*firefox" | grep -v grep | tr -s ' '| cut -d ' ' -f2)
+
+if [ -z $PID ]
+then
+  echo "Could not find a development firefox to attach to."
+fi
+
+gdb $OBJ/dist/bin/firefox $PID

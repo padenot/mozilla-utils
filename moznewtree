@@ -1,0 +1,28 @@
+#!/bin/sh
+
+usage() {
+  echo "$0 destination_dir"
+}
+
+if [ $# -ne 1 ]
+then
+  usage $0
+  exit 1
+fi
+
+echo "Cloning mozilla-central..."
+hg clone http://hg.mozilla.org/mozilla-central $1
+echo "Done."
+
+echo "Cloning patches repo..."
+hg clone http://paul@paul.cx@hg.mozilla.org/users/paul_paul.cx/patches/ .hg/patches
+echo "Done"
+
+echo "Linking mozconfig..."
+if [ ! -e ../mozconfig ]
+then
+  echo "Could not find mozconfig in the parent directory."
+  exit 1
+fi
+ln -s ../mozconfig mozconfig
+echo "Done."

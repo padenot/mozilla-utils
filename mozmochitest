@@ -1,0 +1,54 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/mozcheckdir
+
+usage() {
+  echo "Usage:"
+  echo "$0 [-g] path/to/mochitest.html"
+  echo "\t -g : run in a gdb instance."
+}
+
+if [ $# -lt 1 ]
+then
+  usage $0
+  exit 1
+fi
+
+DEBUG=0
+
+if [ $1 = "-g" ]
+then
+  DEBUG=1
+  shift
+fi
+
+echo $1
+
+OBJ=$(find . -maxdepth 1 -iname "*obj*")
+
+if [ -z $OBJ ]
+then
+  echo "Could not find objdir."
+  exit 1
+fi
+
+command="TEST_PATH="
+
+if [ ! -e $1 ]
+then
+  echo "$1 does not exit."
+  exit 1
+fi
+
+command="$command$1"
+
+if [ $DEBUG = "1" ]
+then
+  command="$command EXTRA_TEST_ARGS='--debugger=gdb'"
+fi
+
+command="$command make -C $OBJ mochitest-plain"
+
+sh -c "$command"
+
