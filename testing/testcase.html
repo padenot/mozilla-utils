@@ -1,0 +1,174 @@
+<html>
+<head>
+<style>
+video {
+  width:600px;
+}
+
+@-moz-keyframes blink {
+  from {
+    background-color: white;
+  }
+
+  to {
+    background-color: red;
+  }
+}
+
+.alert {
+  -moz-animation-duration: 0.5s;
+  -moz-animation-name: blink;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-direction: alternate;
+}
+
+</style>
+</head>
+<body onload='init()'>
+<button onclick="seekafter()">seek after</button>
+<button onclick="seekzero()">seek zero</button>
+<button onclick="seekfivesec()">seek 5sec</button>
+<button onclick="seekmiddle()">seek middle</button>
+
+<video controls>
+</video>
+
+<div style="width: 200px">
+src
+<pre id=src>
+</pre>
+currentTime
+<pre id=currentTime>
+</pre>
+NetworkState
+<pre id=networkState>
+</pre>
+Duration:
+<pre id=duration>
+</pre>
+Played:
+<pre id=played>
+</pre>
+Seekable:
+<pre id=seekable>
+</pre>
+Buffered:
+<pre id=buffered>
+</pre>
+<pre id=progressEvents>
+</pre>
+</div>
+
+
+<script type="text/javascript">
+var $ = document.querySelector;
+$ = $.bind(document);
+var v = $('video');
+var host = "paul.cx/public/slow/";
+var codec = "ogv";
+var networkStateStrings = [
+  "NETWORK_EMPTY",
+  "NETWORK_IDLE",
+  "NETWORK_LOADING",
+  "NETWORK_NO_SOURCE"
+];
+
+setInterval(updateNetworkState, 50);
+setInterval(updateCurrentTime, 100);
+setInterval(buffered, 100);
+setInterval(seekable, 100);
+setInterval(played, 100);
+
+v.addEventListener("durationchange", function()  {
+  var d = $("#duration");
+  if (d.innerHTML != v.duration) {
+    d.innerHTML = v.duration;
+    blink(d, 3000);
+  }
+});
+
+v.addEventListener("suspend", function() {
+  var d = $("#progressEvents");
+  d.innerHTML += 's '
+});
+
+v.addEventListener("progress", function() {
+  var d = $("#progressEvents");
+  d.innerHTML += 'p '
+});
+
+function updateNetworkState() {
+  document.getElementById("networkState").innerHTML =
+    networkStateStrings[v.networkState];
+}
+function updateCurrentTime() {
+  $("#currentTime").innerHTML = v.currentTime;
+}
+function seekafter() {
+  v.currentTime = v.buffered.end(0) + 10;
+}
+function seekzero() {
+  v.currentTime = 0;
+}
+function seekfivesec() {
+  v.currentTime = v.buffered.end(0) - 4;
+}
+function seekmiddle() {
+  v.currentTime = v.buffered.end(0) / 2;
+}
+
+function live() {
+  loadNewSrc(true);
+}
+
+function regular() {
+  loadNewSrc(false);
+}
+
+function loadNewSrc(live) {
+  var src = "http://"+ host +"sintel." + codec;
+  resetTrace($("#progressEvents"));
+  update($("#src"), v.src);
+}
+
+function played() {
+  printRanges(document.getElementById("played"), "played");
+}
+function seekable() {
+  printRanges(document.getElementById("seekable"), "seekable");
+}
+function buffered() {
+  printRanges(document.getElementById("buffered"), "buffered");
+}
+
+function printRanges(node, property) {
+  node.innerHTML = "";
+  for (var i = 0; i < v[property].length; i++) {
+    node.innerHTML += "[" + v[property].start(i) + "," + v[property].end(i) + "] ";
+  }
+}
+
+function init() {
+  v.muted = true;
+  v.src = "http://"+ host +"sintel." + codec;
+  update($("#src"), v.src);
+}
+
+function update(node, content) {
+  node.innerHTML = content;
+  blink(node, 1000);
+}
+
+function resetTrace(node) {
+  node.innerHTML = "";
+}
+
+function blink(node, duration) {
+  node.className = "alert";
+  setTimeout(function() {
+    node.className = '';
+  }, duration);
+}
+</script>
+</body>
+</html>

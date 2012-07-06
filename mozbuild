@@ -30,6 +30,7 @@ do
   if [ $? -ne 0 ]
   then
     notify-send "Build failed."
+    exit
   else
     notify-send "$i OK"
   fi

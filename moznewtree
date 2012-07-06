@@ -18,11 +18,14 @@ echo "Cloning patches repo..."
 hg clone http://paul@paul.cx@hg.mozilla.org/users/paul_paul.cx/patches/ .hg/patches
 echo "Done"
 
+cd $1
+
 echo "Linking mozconfig..."
 if [ ! -e ../mozconfig ]
 then
   echo "Could not find mozconfig in the parent directory."
   exit 1
 fi
+
 ln -s ../mozconfig mozconfig
 echo "Done."
