@@ -1,0 +1,11 @@
+#!/bin/sh
+
+OBJ=$(find . -maxdepth 1 -iname "*obj*")
+
+## Refreshes the current patch, and push to the patch queue repo.
+## $1 (optional) can be a message.
+
+modified=$(hg qapplied | tail -n1)
+hg qref
+hg commit --mq -m"Refreshed $modified$1"
+hg push --mq

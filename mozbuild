@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $DIR/mozcheckdir
@@ -26,7 +26,7 @@ fi
 
 for i in $dirs
 do
-  make -C $OBJ/$i
+  make -j8 -C $OBJ/$i
   if [ $? -ne 0 ]
   then
     notify-send "Build failed."
@@ -35,5 +35,3 @@ do
     notify-send "$i OK"
   fi
 done
-
-notify-send "Build done."
